@@ -1,6 +1,6 @@
 from collection import deque
 processes = []
-with open("sched_basic.txt", "r", encoding="utf-8") as A:
+with open("tests/sched_basic.txt", "r", encoding="utf-8") as A:
   for line in A:
     line = line.strip()
     if not line or line.startswith("#"):
