@@ -1,4 +1,3 @@
-from collection import deque
 processes = []
 with open("tests/sched_basic.txt", "r", encoding="utf-8") as A:
   for line in A:
@@ -97,5 +96,45 @@ def run_srt(list_processes, time_slice=10):
         gantt.append((chosen["pid"], current_time, current_time + run_time))
         chosen["rem"] -= run_time
         current_time += run_time
+
+    return gantt
+from collections import deque
+def run_rr(list_processes, time_slice=10):
+    tasks = []
+    for proc in list_processes:
+        pid, arrive, burst = proc[:3]
+        tasks.append({"pid": pid, "arrive": arrive, "burst": burst, "rem": burst})
+
+    tasks.sort(key=lambda x: (x["arrive"], x["pid"]))
+
+    current_time = 0
+    gantt = []
+    ready_queue = deque()
+    idx = 0
+    n = len(tasks)
+
+    while idx < n or ready_queue:
+        if not ready_queue:
+            if current_time < tasks[idx]["arrive"]:
+                gantt.append(("idle", current_time, tasks[idx]["arrive"]))
+                current_time = tasks[idx]["arrive"]
+
+            while idx < n and tasks[idx]["arrive"] <= current_time:
+                ready_queue.append(tasks[idx])
+                idx += 1
+
+        chosen = ready_queue.popleft()
+
+        run_time = min(time_slice, chosen["rem"])
+        gantt.append((chosen["pid"], current_time, current_time + run_time))
+        chosen["rem"] -= run_time
+        current_time += run_time
+
+        while idx < n and tasks[idx]["arrive"] <= current_time:
+            ready_queue.append(tasks[idx])
+            idx += 1
+
+        if chosen["rem"] > 0:
+            ready_queue.append(chosen)
 
     return gantt
