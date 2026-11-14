@@ -1,15 +1,13 @@
-processes = []
-with open("tests/sched_basic.txt", "r", encoding="utf-8") as A:
-  for line in A:
-    line = line.strip()
-    if not line or line.startswith("#"):
-      continue
-    fields = line.split(",")
-    pid = fields[0].strip()
-    arrive = int(fields[1].strip())
-    burst = int(fields[2].strip())
-    processes.append((pid, arrive, burst))
-print(processes)
+def load_processes(filepath):
+    processes = []
+    with open(filepath, "r", encoding="utf-8") as f:
+        for line in f:
+            line = line.strip()
+            if not line or line.startswith("#"):
+                continue
+            pid, arrive, burst = line.split(",")
+            processes.append((pid.strip(), int(arrive), int(burst)))
+    return processes
 def run_fcfs(list_processes):
     sorted_procs = sorted(list_processes, key=lambda x: (x[1], x[0]))
     current_time = 0
@@ -27,7 +25,7 @@ def run_fcfs(list_processes):
         current_time = finish_time
 
     return gantt
-	def run_sjf(list_processes):
+def run_sjf(list_processes):
   sorted_procs = sorted(list_processes, key=lambda x: (x[1], x[0]))
   current_time = 0
   completed_procs = []
@@ -138,3 +136,18 @@ def run_rr(list_processes, time_slice=10):
             ready_queue.append(chosen)
 
     return gantt
+
+processes = load_processes("tests/sched_basic.txt")
+
+print("FCFS:", run_fcfs(processes))
+print("SJF:", run_sjf(processes))
+print("SRT:", run_srt(processes))
+print("RR:", run_rr(processes))
+
+
+if __name__ == "__main__":
+    processes = load_processes("tests/sched_basic.txt")
+    print("FCFS:", run_fcfs(processes))
+    print("SJF:", run_sjf(processes))
+    print("SRT:", run_srt(processes))
+    print("RR:", run_rr(processes))
