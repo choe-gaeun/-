@@ -1,6 +1,8 @@
+import argparse
 import sys
+from collections import deque
 
-def load_processes(filepath):
+def load_processes(filename):
     processes = []
     try:
         with open(filename, "r", encoding="utf-8") as f:
@@ -239,5 +241,9 @@ def main():
     else:
         print(f"[Error] 지원하지 않는 스케줄링 알고리즘입니다: {args.algo}")
         sys.exit(1)
+
+if __name__ == "__main__":
+    main()
+
 
 
