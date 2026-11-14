@@ -1,12 +1,25 @@
+import sys
+
 def load_processes(filepath):
     processes = []
-    with open(filepath, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line or line.startswith("#"):
-                continue
-            pid, arrive, burst = line.split(",")
-            processes.append((pid.strip(), int(arrive), int(burst)))
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                fields = [x.strip() for x in line.split(",")]
+                pid, arrive, burst = fields[0], int(fields[1]), int(fields[2])
+                if not pid or arrive < 0 or burst <= 0:
+                    raise ValueError("잘못된 값")
+                processes.append((pid, arrive, burst))
+    except Exception as e:
+        print(f"[Error] 파일 읽기 실패: {e}")
+        sys.exit(1)
+
+    if not processes:
+        print("[Error] 프로세스 데이터가 없습니다.")
+        sys.exit(1)
     return processes
 def run_fcfs(list_processes):
     sorted_procs = sorted(list_processes, key=lambda x: (x[1], x[0]))
