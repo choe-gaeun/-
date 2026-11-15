@@ -150,7 +150,10 @@ def print_scheduling_results(algo_name, list_processes, gantt, time_slice=None):
 
     total_time = gantt[-1][2] if gantt else 0
     idle_time = sum(end - start for pid, start, end in gantt if pid == "idle")
-    cpu_util = ((total_time - idle_time) / total_time) * 100 if total_time > 0 else 0.0
+    if total_time > 0:
+        cpu_util = ((total_time - idle_time) / total_time) * 100
+    else:
+        cpu_util = 0.0
 
     active_pids = [pid for pid, _, _ in gantt if pid != "idle"]
     context_switches = 0
