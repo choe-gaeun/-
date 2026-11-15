@@ -18,11 +18,61 @@ def load_references_from_file(filename):
     sys.exit(1)
   return parse_references(" ".join(lines))
   
-def run_fifo(refs, frames_count):
+def run_fifo(references, frames_count):
   frames = []
   page_faults = 0
-  history = []
-  for page in refs:
+  note = []
+  for page in references:
     if page in frames:
-      history.append(
+      note.append((page, list(frames), "S"))
+    else:
+      page_faults += 1
+      if len(frames) == frames_count :
+        frames.pop(0)
+      frames.append(page)
+      note.append((page, list(frames), "F"))
+  return page_faults, note
+
+def run_lru(references, frames_count):
+  frames = []
+  page_faults = 0
+  note = []
+  for page in references:
+    if page in frames:
+      frames.remove(page)
+      frames.append(page)
+      note.append((page, list(frames), "S"))
+    else:
+      page_faults += 1
+      if len(frames) == frames_count :
+        frames.pop(0)
+      frames.append(page)
+      note.append((page, list(frames), "F"))
+  return page_faults, note
+
+def run_opt(references, frames_count):
+  frames = []
+  page_faults = 0
+  note = []
+  for i, page in enumerate(references):
+    if page in frames:
+      note.append((page, list(frames), "S"))
+    else:
+      page_faults += 1
+      if len(frames) == frames_count:
+        remaining = references[i+1:]
+        naga = frames[0]
+        max_dist = -1
+        for f in frames:
+          if f not in remaining:
+            dist = float("inf")
+          else:
+            dist = remaining.index(f)
+          if dist > max_dist:
+            max_dist = dist
+            naga = f
+        frames.remove(naga)
+      frames.append(page)
+      note.append((page, list(frames), "F"))
+  return page_faults, note
       
